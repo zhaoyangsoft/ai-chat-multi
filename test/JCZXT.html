@@ -1,0 +1,481 @@
+<!--  警察，警察抓小偷！的游戏。-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>警察抓小偷游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+
+        .game-info div {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .game-area {
+            position: relative;
+            width: 500px;
+            height: 400px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .police {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .thief {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #FF5722;
+            border-radius: 50%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .controls {
+            margin: 20px 0;
+        }
+
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 20;
+            display: none;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+            position: relative;
+        }
+
+        .instructions li:before {
+            content: "▶";
+            color: #FFD700;
+            position: absolute;
+            left: -15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🚔 警察抓小偷 🦹</h1>
+        
+        <div class="game-info">
+            <div>得分: <span id="score">0</span></div>
+            <div>时间: <span id="time">60</span>秒</div>
+            <div>等级: <span id="level">1</span></div>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="police" id="police">👮</div>
+            <div class="game-over" id="gameOver">
+                <h2>游戏结束!</h2>
+                <p>最终得分: <span id="finalScore">0</span></p>
+                <button onclick="restartGame()">重新开始</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="startGame()" id="startBtn">开始游戏</button>
+            <button onclick="pauseGame()" id="pauseBtn" disabled>暂停</button>
+            <button onclick="restartGame()" id="restartBtn">重新开始</button>
+        </div>
+
+        <div class="instructions">
+            <h3>游戏说明:</h3>
+            <ul>
+                <li>点击警察👮并拖拽到小偷🦹位置来抓捕</li>
+                <li>每抓到一个小偷得10分</li>
+                <li>小偷会随机移动，难度会逐渐增加</li>
+                <li>60秒内尽可能多地抓捕小偷</li>
+                <li>使用WASD键或方向键移动警察</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let gameRunning = false;
+        let gamePaused = false;
+        let score = 0;
+        let timeLeft = 60;
+        let level = 1;
+        let gameInterval;
+        let timeInterval;
+        let thieves = [];
+        let police;
+        let gameArea;
+
+        // 游戏初始化
+        function initGame() {
+            police = document.getElementById('police');
+            gameArea = document.getElementById('gameArea');
+            
+            // 设置警察初始位置
+            police.style.left = '50px';
+            police.style.top = '200px';
+            
+            // 添加键盘控制
+            document.addEventListener('keydown', handleKeyPress);
+            
+            // 添加鼠标拖拽
+            police.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+        }
+
+        // 开始游戏
+        function startGame() {
+            if (gameRunning) return;
+            
+            gameRunning = true;
+            gamePaused = false;
+            score = 0;
+            timeLeft = 60;
+            level = 1;
+            
+            updateDisplay();
+            createThieves();
+            
+            gameInterval = setInterval(gameLoop, 100);
+            timeInterval = setInterval(updateTime, 1000);
+            
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('gameOver').style.display = 'none';
+        }
+
+        // 暂停游戏
+        function pauseGame() {
+            if (!gameRunning) return;
+            
+            if (gamePaused) {
+                gamePaused = false;
+                document.getElementById('pauseBtn').textContent = '暂停';
+            } else {
+                gamePaused = true;
+                document.getElementById('pauseBtn').textContent = '继续';
+            }
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            clearInterval(gameInterval);
+            clearInterval(timeInterval);
+            gameRunning = false;
+            gamePaused = false;
+            
+            // 清除小偷
+            thieves.forEach(thief => thief.element.remove());
+            thieves = [];
+            
+            // 重置警察位置
+            police.style.left = '50px';
+            police.style.top = '200px';
+            
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('pauseBtn').textContent = '暂停';
+            document.getElementById('gameOver').style.display = 'none';
+            
+            updateDisplay();
+        }
+
+        // 创建小偷
+        function createThieves() {
+            const numThieves = Math.min(3 + level, 8);
+            
+            for (let i = 0; i < numThieves; i++) {
+                const thief = document.createElement('div');
+                thief.className = 'thief';
+                thief.innerHTML = '🦹';
+                
+                // 随机位置
+                thief.style.left = Math.random() * (gameArea.offsetWidth - 30) + 'px';
+                thief.style.top = Math.random() * (gameArea.offsetHeight - 30) + 'px';
+                
+                gameArea.appendChild(thief);
+                
+                thieves.push({
+                    element: thief,
+                    x: parseInt(thief.style.left),
+                    y: parseInt(thief.style.top),
+                    speedX: (Math.random() - 0.5) * 4,
+                    speedY: (Math.random() - 0.5) * 4
+                });
+            }
+        }
+
+        // 游戏主循环
+        function gameLoop() {
+            if (gamePaused) return;
+            
+            moveThieves();
+            checkCollisions();
+        }
+
+        // 移动小偷
+        function moveThieves() {
+            thieves.forEach(thief => {
+                // 更新位置
+                thief.x += thief.speedX;
+                thief.y += thief.speedY;
+                
+                // 边界检测
+                if (thief.x <= 0 || thief.x >= gameArea.offsetWidth - 30) {
+                    thief.speedX *= -1;
+                    thief.x = Math.max(0, Math.min(gameArea.offsetWidth - 30, thief.x));
+                }
+                
+                if (thief.y <= 0 || thief.y >= gameArea.offsetHeight - 30) {
+                    thief.speedY *= -1;
+                    thief.y = Math.max(0, Math.min(gameArea.offsetHeight - 30, thief.y));
+                }
+                
+                // 应用新位置
+                thief.element.style.left = thief.x + 'px';
+                thief.element.style.top = thief.y + 'px';
+            });
+        }
+
+        // 碰撞检测
+        function checkCollisions() {
+            const policeRect = police.getBoundingClientRect();
+            
+            thieves.forEach((thief, index) => {
+                const thiefRect = thief.element.getBoundingClientRect();
+                
+                if (policeRect.left < thiefRect.right &&
+                    policeRect.right > thiefRect.left &&
+                    policeRect.top < thiefRect.bottom &&
+                    policeRect.bottom > thiefRect.top) {
+                    
+                    // 抓到小偷
+                    catchThief(index);
+                }
+            });
+        }
+
+        // 抓到小偷
+        function catchThief(index) {
+            // 移除小偷
+            thieves[index].element.remove();
+            thieves.splice(index, 1);
+            
+            // 加分
+            score += 10;
+            updateDisplay();
+            
+            // 如果所有小偷都被抓完，升级
+            if (thieves.length === 0) {
+                level++;
+                createThieves();
+            }
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+        }
+
+        // 更新时间
+        function updateTime() {
+            timeLeft--;
+            document.getElementById('time').textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        // 结束游戏
+        function endGame() {
+            gameRunning = false;
+            clearInterval(gameInterval);
+            clearInterval(timeInterval);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+        }
+
+        // 键盘控制
+        function handleKeyPress(e) {
+            if (!gameRunning || gamePaused) return;
+            
+            const step = 20;
+            const currentLeft = parseInt(police.style.left);
+            const currentTop = parseInt(police.style.top);
+            
+            switch(e.key) {
+                case 'w':
+                case 'ArrowUp':
+                    police.style.top = Math.max(0, currentTop - step) + 'px';
+                    break;
+                case 's':
+                case 'ArrowDown':
+                    police.style.top = Math.min(gameArea.offsetHeight - 40, currentTop + step) + 'px';
+                    break;
+                case 'a':
+                case 'ArrowLeft':
+                    police.style.left = Math.max(0, currentLeft - step) + 'px';
+                    break;
+                case 'd':
+                case 'ArrowRight':
+                    police.style.left = Math.min(gameArea.offsetWidth - 40, currentLeft + step) + 'px';
+                    break;
+            }
+        }
+
+        // 拖拽功能
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        function startDrag(e) {
+            if (!gameRunning || gamePaused) return;
+            
+            isDragging = true;
+            const rect = police.getBoundingClientRect();
+            dragOffsetX = e.clientX - rect.left;
+            dragOffsetY = e.clientY - rect.top;
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const gameRect = gameArea.getBoundingClientRect();
+            let newX = e.clientX - gameRect.left - dragOffsetX;
+            let newY = e.clientY - gameRect.top - dragOffsetY;
+            
+            // 边界限制
+            newX = Math.max(0, Math.min(gameArea.offsetWidth - 40, newX));
+            newY = Math.max(0, Math.min(gameArea.offsetHeight - 40, newY));
+            
+            police.style.left = newX + 'px';
+            police.style.top = newY + 'px';
+        }
+
+        function endDrag() {
+            isDragging = false;
+        }
+
+        // 页面加载完成后初始化游戏
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>

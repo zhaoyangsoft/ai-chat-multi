@@ -1,0 +1,65 @@
+<!-- 一个网页 实现一个贪吃蛇     -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇</title>
+</head>
+<body>
+    <canvas id="canvas" width="400" height="400"></canvas>  
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const snake = {
+            x: 0,
+            y: 0,
+            dx: 10,
+            dy: 0,
+            cells: [],      
+            draw: function() {
+                ctx.fillStyle = '#000000';
+                this.cells.forEach(cell => {
+                    ctx.fillRect(cell.x, cell.y, 10, 10);
+                });
+            }
+        };
+        const food = {
+            x: Math.floor(Math.random() * 20) * 10,
+            y: Math.floor(Math.random() * 20) * 10,
+            draw: function() {
+                ctx.fillStyle = '#FF0000';
+                ctx.fillRect(this.x, this.y, 10, 10);
+            }
+        };
+        function draw() {   
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            snake.draw();
+            food.draw();
+        }
+        function update() {
+            snake.x += snake.dx;
+            snake.y += snake.dy;
+            if (snake.x === food.x && snake.y === food.y) {             
+                snake.cells.push({x: snake.x, y: snake.y});
+                food.x = Math.floor(Math.random() * 20) * 10;
+                food.y = Math.floor(Math.random() * 20) * 10;
+            }
+            if (snake.x < 0 || snake.x > 400 || snake.y < 0 || snake.y > 400) {
+                alert('游戏结束');
+                snake.cells = [];
+                snake.x = 0;
+                snake.y = 0;
+                snake.dx = 10;
+                snake.dy = 0;
+            }
+        }
+        function game() {
+            draw();
+            update();
+        }
+        game();
+    </script>       
+    
+</body>
+</html>
