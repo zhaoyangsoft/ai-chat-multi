@@ -5,8 +5,8 @@ import { ChatRequest } from '../../../types'
 
 // DeepSeek API的端点URL
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions'
-// 从环境变量获取API密钥，如果没有则使用默认值
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || 'sk-a0bb3e093da84cfca66924fe1d64a9ec'
+// 从环境变量获取API密钥
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY
 
 // 处理POST请求的聊天API端点
 export async function POST(request: NextRequest) {

@@ -3,7 +3,7 @@
 // DeepSeek API的端点URL
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 // 从环境变量获取API密钥
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || 'sk-a0bb3e093da84cfca66924fe1d64a9ec';
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
 // 处理POST请求
 export async function onRequestPost(context: any) {
