@@ -1,4 +1,12 @@
 // functions/api/chat.ts
+// 定义Message类型，避免导入路径问题
+interface Message {
+  id: string;
+  content: string;
+  role: 'user' | 'assistant' | 'system';
+  timestamp: string;
+  media?: any[];
+}
 
 // DeepSeek API的端点URL
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
@@ -83,7 +91,7 @@ export async function onRequestPost(context: any) {
     }
 
     // 转换消息格式为DeepSeek API要求的格式
-    const apiMessages = processedMessages.map(msg => ({
+    const apiMessages = processedMessages.map((msg: Message) => ({
       role: msg.role,
       content: msg.content
     }));
@@ -164,7 +172,7 @@ export async function onRequestPost(context: any) {
           }
         } catch (error) {
           console.error('流处理错误:', error);
-          writer.error(error);
+          writer.abort(error);
         } finally {
           reader.releaseLock();
         }
