@@ -1,37 +1,64 @@
+// functions/api/chat.ts
+
 export async function onRequestPost(context: any) {
-    const { request } = context;
+  try {
+    const request = context.request;
     const body = await request.json();
     
-    const userMessage = body.messages?.[body.messages.length - 1]?.content || '';
+    const messages = body.messages || [];
+    const lastMessage = messages[messages.length - 1];
+    const userMessage = lastMessage ? lastMessage.content : '你好！';
     
-    // 创建流式响应
-    const stream = new ReadableStream({
-      start(controller) {
-        const words = `我正在处理您的消息：${userMessage}。这是一个流式响应示例。`.split(' ');
-        
-        let index = 0;
-        const interval = setInterval(() => {
-          if (index < words.length) {
-            controller.enqueue(`data: ${JSON.stringify({
-              choices: [{
-                delta: { content: words[index] + ' ' }
-              }]
-            })}\n\n`);
-            index++;
-          } else {
-            controller.enqueue('data: [DONE]\n\n');
-            controller.close();
-            clearInterval(interval);
-          }
-        }, 200);
+    const response = {
+      choices: [{
+        delta: {
+          content: `我收到了您的消息：${userMessage}。这是一个通过Cloudflare Pages Functions实现的API响应。当前时间：${new Date().toLocaleString('zh-CN')}`
+        }
+      }],
+      usage: {
+        prompt_tokens: userMessage.length,
+        completion_tokens: 50,
+        total_tokens: userMessage.length + 50
+      }
+    };
+
+    return new Response(JSON.stringify(response), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
       }
     });
-  
-    return new Response(stream, {
+  } catch (error) {
+    return new Response(JSON.stringify({ error: '处理请求失败' }), {
+      status: 500,
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
       }
     });
   }
+}
+
+// 处理OPTIONS请求（CORS预检）
+export async function onRequestOptions(context: any) {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    }
+  });
+}
+
+// 处理GET请求（用于测试）
+export async function onRequestGet(context: any) {
+  return new Response(JSON.stringify({ 
+    message: 'Chat API is running',
+    timestamp: new Date().toISOString()
+  }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
