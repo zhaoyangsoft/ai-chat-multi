@@ -1,4 +1,3 @@
-// 标记为客户端组件，启用客户端交互功能
 'use client'
 
 // 导入React
@@ -23,7 +22,9 @@ export default function Home() {
     tokensPerSecond: 0,   // 令牌生成速度
     modelName: 'DeepSeek Chat', // 模型名称
     temperature: 0.7,     // 温度参数
-    maxTokens: 2048       // 最大令牌数
+    maxTokens: 2048,      // 最大令牌数
+    modelType: 'deepseek-chat', // 模型类型
+    capabilities: ['chat', 'code-generation', 'text-analysis'] // 模型能力
   })
 
   // 创建对消息列表末尾的引用，用于自动滚动

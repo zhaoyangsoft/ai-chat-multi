@@ -1,3 +1,5 @@
+'use client';
+
 import { Suspense } from 'react';
 import SSRDemo from '@/components/SSRDemo';
 import SSGDemo from '@/components/SSGDemo';
@@ -8,7 +10,28 @@ import Header from '@/components/Header';
 export default function SSRDemoPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Header />
+      {/* 静态Header，不需要事件处理函数 */}
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">🚀</span>
+              <h1 className="text-xl font-bold text-gray-900">
+                AI企业工作流优化平台
+              </h1>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <a 
+              href="/"
+              className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            >
+              <span className="text-sm font-medium">返回主页</span>
+            </a>
+          </div>
+        </div>
+      </header>
       
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}

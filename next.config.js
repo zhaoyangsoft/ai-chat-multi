@@ -19,20 +19,8 @@ const nextConfig = {
     appDir: true,
   },
   
-  // API路由配置（静态导出时API路由不可用）
-  async headers() {
-    return [
-      {
-        source: '/api/chat',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate',
-          },
-        ],
-      },
-    ]
-  },
+  // 注意：静态导出模式下，headers配置不会生效
+  // 如果需要自定义响应头，请在部署平台（如Cloudflare）中配置
 }
 
 // - 1.
